@@ -39,15 +39,10 @@ class Birdmash_Widget extends WP_Widget {
 		if (!empty($title)):
     		echo $before_title . $title . $after_title;;
     	endif;
-  		
-  		//$this->callTwitterFeed($usernames, $count, $retweets);
-  		
 
   		// -- Twitter Output
   		foreach($usernames as $user){
-  			//$output  = '<h2>Tweets from '.$user .'</h2>';
-    	 	$this->callTwitterFeed($usernames, $user, $count, $retweets);
-
+  			$this->callTwitterFeed($usernames, $user, $count, $retweets);
     	}
 
     	// -- End Twitter Output
@@ -165,6 +160,8 @@ class Birdmash_Widget extends WP_Widget {
 
 	public function passitOn($jsonTweets, $username){
 		echo '<h2>Tweets from '.$username .'</h2>';
+		$i = 0;
+
 
 		// DISPLAY THE TWEETS
 		foreach($jsonTweets as $status):
@@ -173,7 +170,17 @@ class Birdmash_Widget extends WP_Widget {
 			$userStatus = preg_replace('/https:\/\/t.co\/([a-zA-Z0-9]+)/i', '<a href="https://t.co/$1">http://$1</a>', $userStatus);
 			$output  = '<p>'.$userStatus.'</p>';
 			$output .= '<p><a href="https://twitter.com/intent/user?screen_name='.$username.'">@'.$username.'</a></p>';
-			echo $output;	
+			$data    = get_transient('cacheTwitter_'.$i++.'');
+			if ($data === false) {
+		        $output  = '<p>'.$userStatus.'</p>';
+				$output .= '<p><a href="https://twitter.com/intent/user?screen_name='.$username.'">@'.$username.'</a></p>';
+				set_transient('cacheTwitter_'.$i++.'', $output, 3600 * 24);
+				echo $output;
+		    }else{
+		    	echo $data;
+		    }
+
+   
 		endforeach;
 	}
 
