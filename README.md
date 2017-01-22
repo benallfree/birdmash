@@ -2,23 +2,21 @@
 
 Hey thanks for taking on our programming challenge. Please work for 1-2 hours, but don't stress too hard. We don’t expect you to finish this challenge (unless you really want to); it’s more to get a sense of your approach to programming.
 
-## Objective
+## Notes the Sinead
 
-Write a WordPress widget that shows a mashup of Twitter activity from selected users. Deliver plugin via github or bitbucket repo.
+I have chosen to build this with PHP soley and without the use of a library
 
-## Instructions
+There are obviously librarys out there that may cut time in development for faster implementation. However, I wasnted to show my skill based on Code I have build in the past and that has been used by myself and others many times in various environments.
 
-* Clone this repo. It contains a WordPress plugin and widget stub
-* The widget admin should accept a comma-separated list of Twitter usernames
-* The widget frontend should display the 3 most recent activity items from each user, in chronological order (most recent first). Activity should be fetched server-side, not client-side.
-* Send a pull request to me when you're done or when it's been 2 hours
+I have also used node-twitter-api for this purpose. Should I be using a more robust and versatile system and for future development, I would tend to favour the node-twitter-api route and build the entire widget within a JS environment. This would allow me more scope for building a single page application approach and increasing the performance of the code.
 
-## Bonus points (in order of WOW factor)
+I have also included a class-loader.php as an example of a bolierplate I use. This allows me to build plugins very uickly and I can give you access to examples of this being used should you require further information
 
-* Use of `npm`, `webpack`, and `es6` in the build process
-* On the frontend, let the user press a little gear icon to add more Twitter handles. The Twitter handles are stored in a cookie. Activity from user-supplied Twitter handles should be combined with the system-supplied Twitter handles.
-* If the user is authenticated, the Twitter handles are stored and loaded from his user settings instead of cookie.
-* PHP7 compatibility
-* Caching the query results for 60 minutes
+If you have any questions on my approach, please feel free to contact me
+
+hello@sinead-oconnor.co.uk
+
+
+
 
 
