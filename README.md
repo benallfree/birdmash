@@ -2,7 +2,9 @@
 
 Hey thanks for taking on our programming challenge. Please work for 1-2 hours, but don't stress too hard. We don’t expect you to finish this challenge (unless you really want to); it’s more to get a sense of your approach to programming.
 
-## Notes the Sinead
+## Notes From Sinead
+
+Time Taken (approx 1hr 40)
 
 I have chosen to build this with PHP soley and without the use of a library
 
