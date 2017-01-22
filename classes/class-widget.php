@@ -165,16 +165,20 @@ class Birdmash_Widget extends WP_Widget {
 
 		// DISPLAY THE TWEETS
 		foreach($jsonTweets as $status):
+			$idStr      = $status['id'];
 			$userStatus = htmlentities($status['text'], ENT_QUOTES, 'UTF-8');
 			$userStatus = preg_replace('/http:\/\/t.co\/([a-zA-Z0-9]+)/i', '<a href="http://t.co/$1">http://$1</a>', $userStatus);
 			$userStatus = preg_replace('/https:\/\/t.co\/([a-zA-Z0-9]+)/i', '<a href="https://t.co/$1">http://$1</a>', $userStatus);
 			$output  = '<p>'.$userStatus.'</p>';
 			$output .= '<p><a href="https://twitter.com/intent/user?screen_name='.$username.'">@'.$username.'</a></p>';
-			$data    = get_transient('cacheTwitter_'.$i++.'');
-			if ($data === false) {
+			$data    = get_transient('cacheTwitter_'.$idStr.'');
+			$overall = get_transient('cacheTwitter');
+			if ($overall === false) {
 		        $output  = '<p>'.$userStatus.'</p>';
 				$output .= '<p><a href="https://twitter.com/intent/user?screen_name='.$username.'">@'.$username.'</a></p>';
-				set_transient('cacheTwitter_'.$i++.'', $output, 3600 * 24);
+				set_transient('cacheTwitter_'.$idStr.'', $output, 3600 * 24);
+				set_transient('cacheTwitter', $output, 3600 * 24);
+
 				echo $output;
 		    }else{
 		    	echo $data;
