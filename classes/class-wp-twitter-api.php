@@ -11,7 +11,7 @@ if ( ! defined( 'ABSPATH' ) ) {
     die( '-1' );
 }
 
-class CtfOauthConnect
+class OauthConnect
 {
     /**
      * @var string

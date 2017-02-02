@@ -56,7 +56,7 @@ class Birdmash_Widget extends WP_Widget {
                 $get_fields['screen_name'] = $user;
                 $get_fields['count'] = 3;
 
-                $twitter_connect = new CtfOauthConnect( $this->settings, 'usertimeline' );
+                $twitter_connect = new OauthConnect( $this->settings, 'usertimeline' );
                 $twitter_connect->setUrlBase();
                 $twitter_connect->setGetFields( $get_fields );
                 $twitter_connect->setRequestMethod( 'GET' );
