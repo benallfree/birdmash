@@ -97,8 +97,6 @@ function bm_settings_page() {
 
 
 function bm_admin_css() {
-  $plugin = get_plugin_data( __FILE__, false, false);
   // The css only shows a Twitter icon using dashicons in the <h2> title
-  wp_register_style( 'bm_admin', plugins_url( '../css/admin.css', __FILE__ ), false, $plugin['Version'] );
-  wp_enqueue_style( 'bm_admin' );
+  wp_enqueue_style( 'bm_admin', plugins_url( '../css/admin.css', __FILE__ ) );
 }
