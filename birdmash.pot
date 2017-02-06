@@ -1,0 +1,28 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: Birdmash\n"
+"POT-Creation-Date: 2017-02-03 20:54+0100\n"
+"PO-Revision-Date: 2017-02-03 20:55+0100\n"
+"Last-Translator: interQué <luis@iqn.es>\n"
+"Language-Team: \n"
+"Language: en_US\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Poedit 1.8.6\n"
+"X-Poedit-Basepath: .\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Poedit-SourceCharset: UTF-8\n"
+"X-Poedit-KeywordsList: __;_(\n"
+"X-Poedit-SearchPath-0: .\n"
+"X-Poedit-SearchPath-1: includes\n"
+"X-Poedit-SearchPathExcluded-0: twitteroauth\n"
+
+#: plugin.php:58
+msgid "No tweets found."
+msgstr ""
+
+#: plugin.php:83
+#, php-format
+msgid "You must configure <a href=\"%s\">Birdmash Twitter</a> first."
+msgstr ""
