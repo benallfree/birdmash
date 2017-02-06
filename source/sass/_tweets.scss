@@ -1,0 +1,112 @@
+.tweet {
+    background-color: $white;
+    border-radius: .2em;
+    margin-bottom: 1em;
+    padding: 1em;
+    border: 1px solid $accentGrayExtraLt;
+    color: $accentGrayDrk;
+    & a {
+        color: $twitterBlue;
+        &:hover {
+            color: darken( $twitterBlue, 10% );
+        }
+    }
+    header {
+        overflow: hidden;
+        margin-bottom: 1em;
+    }
+    .avatar {
+        float: left;
+        margin-right: 0.5em;
+        border-radius: .3em;
+    }
+    .userinfo {
+        text-decoration: none;
+        box-shadow: none;
+        width: 80%;
+        display: inline-block;
+    }
+    .full-name {
+        color: #000000;
+        font-size: 0.9em;;
+        line-height: 1;
+        display: block;
+        margin-bottom: 0;
+        margin-top: 0.6em;
+    }
+    .username {
+        color: $accentGrayLt;
+        display: block;
+        font-size: .7em;
+        line-height: 1;
+        margin-top: 0.2em;
+        &:hover {
+            color: darken( $twitterBlue, 10% );
+        }
+    }
+    .logo {
+        width: 12%;
+        display: inline-block;
+        text-decoration: none;
+        box-shadow: none;
+        img {
+            text-align: right;
+            margin-top: 0.5em;
+        }
+    }
+    .body {
+        font-size: .9em;
+    }
+    footer {
+        font-size: 0.7em;
+        margin-top: 0.4em;
+        .intents {
+            overflow: hidden;
+            margin-top: 0.5em;
+            svg {
+                font-size: 1em;
+            }
+            a {
+                text-decoration: none;
+                box-shadow: none;
+            }
+        }
+        .reply {
+            width: 15%;
+            display: inline-block;
+            path {
+                fill: $intentsDefault;
+                &:active ,
+                &:hover {
+                    fill: $intentsPressed;
+                }
+            }
+        }
+        .retweet {
+            width: 15%;
+            display: inline-block;
+            path {
+                fill: $intentsDefault;
+                &:active {
+                    fill: $intentsPressed;
+                }
+                &:hover {
+                    fill: $retweetHover;
+                }
+            }
+        }
+        .like {
+            width: 15%;
+            display: inline-block;
+            path {
+                fill: $intentsDefault;
+                &:active {
+                    fill: $intentsPressed;
+                }
+                &:hover {
+                    fill: $likeHover;
+                }
+            }
+        }
+    }
+}
