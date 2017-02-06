@@ -36,98 +36,120 @@ if (!class_exists('Birdmash_Widget')){
 			// outputs the content of the widget
 
 			extract($args);
+
+			global $interval;
 			
 			$title = apply_filters('widget_title', $instance['title']);
 			$username = $instance['username'];
 			$posts = $instance['posts'];
+			$cachetime = $instance['cachetime'];
+			$consumerKey = $instance['consumerKey'];
+			$consumerSecret = $instance['consumerSecret'];
+			$accessToken = $instance['accessToken'];
+			$accessTokenSecret = $instance['accessTokenSecret'];
+			$uniqueId = $instance['uniqueId'];
 
 			echo $before_widget;
 
-			$upload = wp_upload_dir();
-			$cachefile = $upload['basedir'] . '/_twitter_' . $username . '.txt';
-
 			$settings = array(
-				'oauth_access_token' => "594651970-6dKo4P3k6MsXHKVb8hJrh8fqeZAVMALiU40AzVdV",
-				'oauth_access_token_secret' => "ZRpMF7YNPsvKaU0EPKkJTlu9QlskUKwp7OcVOjX4AV2uc",
-				'consumer_key' => "lMR1T8Cb9KPIDscMsG9oMFvUZ",
-				'consumer_secret' => "b9MGYKLncJVba3lQbhu9iVUKzxirH99neKSBmXIKwn1QjQUKE5"
+				'oauth_access_token' => $accessToken,
+				'oauth_access_token_secret' => $accessTokenSecret,
+				'consumer_key' => $consumerKey,
+				'consumer_secret' => $consumerSecret
 			);
 
 			if (!empty($title)){
 				echo $before_title . $title . $after_title;
 			}
 
-			if (!file_exists($cachefile)){
+			add_filter('wp_feed_cache_transient_lifetime', array(&$this, 'setInterval'));
+			include_once(ABSPATH . WPINC . '/feed.php');
 
-				//split usernames 
-				$usernames = explode(',', $username);
-	
-				foreach ($usernames as $user) {
+			$upload = wp_upload_dir();
+			$cachefile = $upload['basedir'] . '/_twitter_' . $uniqueId . '.txt';
+
+			if (!file_exists($cachefile)){
+				$usernames = explode(',', str_replace(' ', '', $username));
+				$tweets = array();
+				$sortedTweets = array();
+
+				foreach ($usernames as &$user) {
 					$url            = 'https://api.twitter.com/1.1/statuses/user_timeline.json';
-					$getfield       = '?screen_name=' . trim($user) . '&count=' . $posts . '&trim_user=true';
+					$getfield       = '?screen_name=' . $user . '&count=' . $posts; // . '&trim_user=true';
 					$request_method = 'GET';
 
-					$twitter_instance = new Twitter_API_WordPress( $settings );
+					$twitter_instance = new Twitter_API_WordPress($settings);
 
 					$jsonData = $twitter_instance
 						->set_get_field( $getfield )
 						->build_oauth( $url, $request_method )
 						->process_request();
 
-					if(is_array($tweets)){
-						$tweets = array_merge($tweets, json_decode($jsonData, true));
-					} else{
-						$tweets = json_decode($jsonData, true);
-					}
-				}
+					$tweets = array_merge($tweets, json_decode($jsonData, true));		
+				}	
 
-				//TODO - Sort Array 
+				foreach	($tweets as &$tweet){
+					$time = date_parse($tweet[created_at]);
+					$sortedTweets[] = array(
+						'createDate' => $tweet[created_at],
+						'postText' => $tweet[text],
+						'postName' => $user,
+						'tweetId' => $tweet[id_str],
+						'link' => 'https://twitter.com/' . $tweet[user][screen_name] . '/status/' . $tweet[id_str],
+						'time' => mktime($time['hour'], $time['minute'], $time['second'], $time['month'], $time['day'], $time['year']),
+					);
+				}				
+
+				usort($sortedTweets, function($item1, $item2) {
+			    	if ($item1['time'] == $item2['time']) {
+			    		return 0;
+			    	}
+			    	return $item1['time'] < $item2['time'] ? 1 : -1; }
+			    );
 
 				$result = '<ul>';
 
-				foreach	($tweets as &$tweet){
-					if(is_array($tweet)){
-						$createDate = $tweet[created_at];
-						$postText = $tweet[text];
-						$postName = $tweet[screen_name];
-						$tweetId = $tweet[id_str];
-						
-						$result .= '<li>';
+				foreach	($sortedTweets as &$tweet){
+					$createDate = $tweet[createDate];
+					$postText = $tweet[postText];
+					$postName = $tweet[postName];
+					$tweetId = $tweet[tweetId];
+					$link = $tweet[link];
 
-						$time = strtotime($createDate);
-						
-						if ((abs(time() - $time)) < 86400){
-							$time = human_time_diff($time) . ' ago';
-						}
-						else{
-							$time = date('F j, Y', $time);
-						}
+					$result .= '<li>';
 
-						$text = htmlspecialchars_decode($postText);
-						//urls
-						$text = preg_replace('`\b(([\w-]+://?|www[.])[^\s()<>]+(?:\([\w\d]+\)|([^[:punct:]\s]|/)))`', '<a href="$0">$0</a>', $text);
-						//users
-				    	$text = preg_replace('/(@)([a-zA-Z0-9\_]+)/', '@<a href="https://twitter.com/$2">$2</a>', $text);
-				    	//hash tags
-						$text = preg_replace('/(#)([a-zA-Z0-9\_]+)/', '#<a target="_new" href="https://twitter.com/search/?q=$2">$2</a>', $text);
-
-			    		$result .= '<div style="font-size:14px;padding-top: 15px;">' . $text . '</div>';
-						$result .= '<div style="text-align:right;"><a style="font-size:85%" href="http://twitter.com/'.$postName.'/statuses/'.$tweetId.'">'. $time .'</a></div>';
-						$result .= '</li>';
-
-					}else{
-						echo 'not an array';
+					$time = strtotime($createDate);
+					
+					if ((abs(time() - $time)) < 86400){
+						$time = human_time_diff($time) . ' ago';
 					}
+					else{
+						$time = date('F j, Y', $time);
+					}
+
+					$text = htmlspecialchars_decode($postText);
+					//urls
+					$text = preg_replace('/((http)+(s)?:\/\/[^<>\s]+)/i', '<a href="$0" target="_blank" rel="nofollow">$0</a>', $text);
+					//users
+			    	$text = preg_replace('/[@]+([A-Za-z0-9-_]+)/', '<a href="https://twitter.com/$1" target="_blank" rel="nofollow">@$1</a>', $text);
+			    	//hash tags
+					$text = preg_replace('/[#]+([A-Za-z0-9-_]+)/', '<a href="https://twitter.com/search/?q=%23$1" target="_blank" rel="nofollow">$1</a>', $text);
+					
+					$result .= '<div>';
+					$result .= '<div style="font-size:14px;padding-top: 15px;">' . $text . '</div>';
+					$result .= '<div style="text-align:right;"><a style="font-size:85%" href="' . $link .'">' . $postName . ' at '. $time .'</a></div>';
+					$result .= '</div>';
+					$result .= '</li>';
+
 				}
 				
 				$result .= '</ul>';
 				
-				//@file_put_contents($cachefile, $result);
+				@file_put_contents($cachefile, $result);
 
 				echo $result;
 			}
 			else{ 
-				echo 'else file already here';
 				$result = @file_get_contents($cachefile);
 
 				if (!empty($result)){
@@ -136,6 +158,11 @@ if (!class_exists('Birdmash_Widget')){
 			}
 
 			echo $after_widget;
+		}
+
+		function setInterval() {
+			global $interval;
+			return $interval;
 		}
 
 		/**
@@ -149,7 +176,13 @@ if (!class_exists('Birdmash_Widget')){
 			$defaults = array(
 				'title' => 'Latest Tweets', 
 				'username' => '', 
-				'posts' => 3);
+				'posts' => 3,
+				'cachetime' => 30,
+				'accessToken' => "594651970-6dKo4P3k6MsXHKVb8hJrh8fqeZAVMALiU40AzVdV",
+				'accessTokenSecret' => "ZRpMF7YNPsvKaU0EPKkJTlu9QlskUKwp7OcVOjX4AV2uc",
+				'consumerKey' => "lMR1T8Cb9KPIDscMsG9oMFvUZ",
+				'consumerSecret' => "b9MGYKLncJVba3lQbhu9iVUKzxirH99neKSBmXIKwn1QjQUKE5"
+				);
 
 			$instance = wp_parse_args((array) $instance, $defaults);
 ?>
@@ -168,6 +201,34 @@ if (!class_exists('Birdmash_Widget')){
 				<label for="<?php echo $this->get_field_id('posts'); ?>">Number of posts to display</label>
 				<input class="widefat" type="text" id="<?php echo $this->get_field_id('posts'); ?>" name="<?php echo $this->get_field_name('posts'); ?>" value="<?php echo $instance['posts']; ?>">
 			</p>
+
+			<p>
+				<label for="<?php echo $this->get_field_id('cachetime'); ?>">Number of minutes to cache</label>
+				<input class="widefat" type="text" id="<?php echo $this->get_field_id('cachetime'); ?>" name="<?php echo $this->get_field_name('cachetime'); ?>" value="<?php echo $instance['cachetime']; ?>">
+			</p>
+
+			<br/>
+			<h3>Twitter Required Feilds</h3>
+			<p>
+				<label for="<?php echo $this->get_field_id('consumerKey'); ?>">Consumer Key</label>
+				<input class="widefat" type="text" id="<?php echo $this->get_field_id('consumerKey'); ?>" name="<?php echo $this->get_field_name('consumerKey'); ?>" value="<?php echo $instance['consumerKey']; ?>">
+			</p>
+
+			<p>
+				<label for="<?php echo $this->get_field_id('consumerSecret'); ?>">Consumer Secret</label>
+				<input class="widefat" type="text" id="<?php echo $this->get_field_id('consumerSecret'); ?>" name="<?php echo $this->get_field_name('consumerSecret'); ?>" value="<?php echo $instance['consumerSecret']; ?>">
+			</p>
+
+			<p>
+				<label for="<?php echo $this->get_field_id('accessToken'); ?>">Access Token</label>
+				<input class="widefat" type="text" id="<?php echo $this->get_field_id('accessToken'); ?>" name="<?php echo $this->get_field_name('accessToken'); ?>" value="<?php echo $instance['accessToken']; ?>">
+			</p>
+
+			<p>
+				<label for="<?php echo $this->get_field_id('accessTokenSecret'); ?>">Access Token Secret</label>
+				<input class="widefat" type="text" id="<?php echo $this->get_field_id('accessTokenSecret'); ?>" name="<?php echo $this->get_field_name('accessTokenSecret'); ?>" value="<?php echo $instance['accessTokenSecret']; ?>">
+			</p>
+
 			
 <?php
 		}
@@ -182,14 +243,21 @@ if (!class_exists('Birdmash_Widget')){
 			// processes widget options to be saved
 			$instance = $old_instance;
 
+ 			$instance['uniqueId'] = (empty($instance['uniqueId'])) ? uniqid() : $instance['uniqueId'];
 			$instance['title'] = $new_instance['title'];
 			$instance['username'] = $new_instance['username'];
 			$instance['posts'] = $new_instance['posts'];
-			
-			$upload = wp_upload_dir();
-			$cachefile = $upload['basedir'] . '/_twitter_' . $old_instance['username'] . '.txt';
-			@unlink($cachefile);
+			$instance['cachetime'] = $new_instance['cachetime'];
 
+			$instance['consumerKey'] = trim(strip_tags($new_instance['consumerKey']));
+			$instance['consumerSecret'] = trim(strip_tags($new_instance['consumerSecret']));
+			$instance['accessToken'] = trim(strip_tags($new_instance['accessToken']));
+			$instance['accessTokenSecret'] = trim(strip_tags($new_instance['accessTokenSecret']));
+
+			$upload = wp_upload_dir();
+			$cachefile = $upload['basedir'] . '/_twitter_' . $old_instance['uniqueId'] . '.txt';
+			@unlink($cachefile);
+			
 			return $instance;
 		}
 	}
