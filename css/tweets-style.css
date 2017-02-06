@@ -1,0 +1,23 @@
+/* Simple styling for Birdmash_Widget */
+
+.twitter-section {
+    border: 5px #E8F4FB solid;
+}
+
+.twitter-containter {
+    background-color: #ffffff;
+    padding-left: 10px;
+    padding-right: 10px;
+    font-style: italic;
+    border-radius: 5px;
+}
+.twitter-author {
+    font-weight: bold;
+    padding: 10px;
+    background-color: #E8F4FB;
+}
+.btn-tweet {
+    background-color: #44A8E5;
+    padding: 5px;
+    width: 100%;
+}
