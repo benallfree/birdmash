@@ -1,0 +1,18 @@
+{
+    "name": "damonsharp/birdmash",
+    "authors": [
+        {
+            "name": "Damon Sharp",
+            "email": "damon.sharp@gmail.com"
+        }
+    ],
+    "require": {
+        "abraham/twitteroauth": "^0.7.2"
+    },
+    "autoload": {
+		"classmap": [
+			"inc/class-birdmash-tweets.php",
+			"inc/widgets/birdmash_widget.php"
+		]
+    }
+}

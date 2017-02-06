@@ -1,0 +1,14 @@
+// Base Colors
+$accentGray        : #666666;
+$accentGrayLt      : lighten( $accentGray, 15% );
+$accentGrayExtraLt : lighten( $accentGray, 50% );
+$accentGrayDrk     : darken( $accentGray, 15% );
+$white             : #ffffff;
+
+// Twitter
+$twitterBlue	   	: #55ACEE;
+$intentsDefault 	: #AAB8C2;
+$intentsPressed 	: rgba( $intentsDefault, 0.5 );
+$retweetInactive	: rgba( $intentsDefault, 0.3 );
+$retweetHover   	: #19CF86;
+$likeHover      	: #E81C4F;
