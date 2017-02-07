@@ -1,6 +1,14 @@
 # Twitter Mashup Widget
-
-Hey thanks for taking on our programming challenge. Out of respect for your time, please work for 1-2 hours, but don't stress too hard. This is not a timed challenge, feel free to spend as little or as much time as you desire. I don’t expect you to finish this challenge (unless you really want to); it’s more to get a sense of your approach to programming. The people who get hired tend to show their *best* and *most elegant* work rather than their quickest or most feature-complete work.
+Twitter Mashup Widget is a WordPress plugin that shows a mashup of Twitter activity from selected multiple users. 
+## Installation
+* Upload the plugin to plugins folder 
+* Run `composer install` command from inside birdmash folder so its install plugin dependency packages.
+* From the admin installed plugin  page active the plugin
+* From the widget find the Birdmash Widget and place in the desired sidebar
+* Put Title
+* Put Twitter names seperated by comma (,) eg. snumanik,WordPress,carlsmith,jeffrey_way,martinfowler
+* Set Twitter API credentials [get the API credentials from <https://dev.twitter.com/> ]
+* Hit save and Done
 
 ## Objective
 

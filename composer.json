@@ -1,0 +1,14 @@
+{
+    "name": "manik/birdmash",
+    "description": "WordPress simple twitter meshup widget",
+    "type": "project",
+    "authors": [
+        {
+            "name": "MD Sultan Nasir Uddin",
+            "email": "manikdrmc@gmail.com"
+        }
+    ],
+    "require": {
+        "abraham/twitteroauth": "^0.7.2"
+    }
+}
