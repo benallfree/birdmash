@@ -6,7 +6,9 @@ Version: 1.0
 Author: Haxor
 */
 require __DIR__ . '/vendor/autoload.php';
+
 class Birdmash_Widget extends WP_Widget {
+	protected $transient_name;
 
 	/**
 	 * Sets up the widgets name etc
@@ -17,7 +19,8 @@ class Birdmash_Widget extends WP_Widget {
 			'description' => 'Multiuser Twitter Mashup',
 		);
 		parent::__construct( 'birdmash_widget', 'Birdmash Widget', $widget_ops );
-		add_action('wp_enqueue_scripts', array($this, 'register_scripts'));
+		add_action( 'wp_enqueue_scripts', array( $this, 'register_scripts' ) );
+		$this->transient_name = 'birdmash_widget_tweets';
 	}
 
 	/**
@@ -27,142 +30,146 @@ class Birdmash_Widget extends WP_Widget {
 	 * @param array $instance
 	 */
 	public function widget( $args, $instance ) {
-		extract($args, EXTR_SKIP);
+		extract( $args, EXTR_SKIP );
 		echo $before_widget;
-        $title = empty($instance['title']) ? ' ' : apply_filters('widget_title', $instance['title']);
-        $names = isset($instance['names'])? explode(',',$instance['names']):'';
-		$consumerKey 		= trim($instance['consumerKey']);
-		$consumerSecret 	= trim($instance['consumerSecret']);
-		$accessToken 		= trim($instance['accessToken']);
-		$accessTokenSecret	= trim($instance['accessTokenSecret']);
-		$transient_name = 'birdmash_widget_tweets';
+		$title             = empty( $instance['title'] ) ? ' ' : apply_filters( 'widget_title', $instance['title'] );
+		$names             = isset( $instance['names'] ) ? explode( ',', $instance['names'] ) : '';
+		$consumerKey       = trim( $instance['consumerKey'] );
+		$consumerSecret    = trim( $instance['consumerSecret'] );
+		$accessToken       = trim( $instance['accessToken'] );
+		$accessTokenSecret = trim( $instance['accessTokenSecret'] );
+
 		$count_tweet = 3;
-		$interval = 30;//in minute
+		$interval    = 30;//in minute
 
-		if (!empty($title))
+		if ( ! empty( $title ) ) {
 			echo $before_title . $title . $after_title;
+		}
 
 
-		if(false == get_transient($transient_name)):
+		if ( false == get_transient( $this->transient_name ) ):
 
 
-
-		$conn = new Abraham\TwitterOAuth\TwitterOAuth(
-			$consumerKey,
-			$consumerSecret,
-			$accessToken,
-			$accessTokenSecret
-		);
-
-		$allTweets = array();
-        foreach ($names as $name){
-	        $allTweets[] = $conn->get(
-		        'statuses/user_timeline',
-		        array(
-			        'screen_name'    => $name,
-			        'count'           	=> $count_tweet,
-			        'exclude_replies' => $count_tweet
-		        )
-	        );
-        }
-
-
-		$tweets = array();
-
-
-		foreach ($allTweets as $perPersonTweets){
-
-            foreach ($perPersonTweets as $tweet){
-                $name = $tweet->user->name;
-	            $screen_name = $tweet->user->screen_name;
-                if(is_ssl()){
-	                $avatarLink = $tweet->user->profile_avatar_url_https;
-                }else{
-	                $avatarLink = $tweet->user->profile_image_url;
-                }
-	            $permalink = 'http://twitter.com/'. $screen_name .'/status/'. $tweet->id_str;
-	            $time = $tweet->created_at;
-	            $time = date_parse($time);
-	            $uTime = mktime($time['hour'], $time['minute'], $time['second'], $time['month'], $time['day'], $time['year']);
-
-	            $content = $this->process_contents($tweet);
-                $tweets[] = array(
-				'content' => $content,
-				'name' => $name,
-				'screen_name' => $screen_name,
-				'permalink' => $permalink,
-				'avatar_link' => $avatarLink,
-				'time' => $uTime,
+			$conn = new Abraham\TwitterOAuth\TwitterOAuth(
+				$consumerKey,
+				$consumerSecret,
+				$accessToken,
+				$accessTokenSecret
 			);
-            }
-        }
 
-		usort($tweets, function ($tweet1, $tweet2){
-		    return $tweet2['time'] - $tweet1['time'];
-        });
-        set_transient($transient_name, $tweets, 30*$interval);
-        else:
-         $tweets = get_transient($transient_name);
-        endif;
+			$allTweets = array();
+			foreach ( $names as $name ) {
+				$allTweets[] = $conn->get(
+					'statuses/user_timeline',
+					array(
+						'screen_name'     => $name,
+						'count'           => $count_tweet,
+						'exclude_replies' => $count_tweet
+					)
+				);
+			}
+
+
+			$tweets = array();
+
+
+			foreach ( $allTweets as $perPersonTweets ) {
+
+				foreach ( $perPersonTweets as $tweet ) {
+					$name        = $tweet->user->name;
+					$screen_name = $tweet->user->screen_name;
+					if ( is_ssl() ) {
+						$avatarLink = $tweet->user->profile_avatar_url_https;
+					} else {
+						$avatarLink = $tweet->user->profile_image_url;
+					}
+					$permalink = 'http://twitter.com/' . $screen_name . '/status/' . $tweet->id_str;
+					$time      = $tweet->created_at;
+					$time      = date_parse( $time );
+					$uTime     = mktime( $time['hour'], $time['minute'], $time['second'], $time['month'], $time['day'], $time['year'] );
+
+					$content  = $this->process_contents( $tweet );
+					$tweets[] = array(
+						'content'     => $content,
+						'name'        => $name,
+						'screen_name' => $screen_name,
+						'permalink'   => $permalink,
+						'avatar_link' => $avatarLink,
+						'time'        => $uTime,
+					);
+				}
+			}
+
+			usort( $tweets, function ( $tweet1, $tweet2 ) {
+				return $tweet2['time'] - $tweet1['time'];
+			} );
+			set_transient( $this->transient_name, $tweets, $interval*60 );
+		else:
+			$tweets = get_transient( $this->transient_name );
+		endif;
 
 		echo '<ul class="birdmash-tweet-list">';
-		if($tweets) :
-            foreach ($tweets as $key => $val){
-		        ?>
+		if ( $tweets ) :
+			foreach ( $tweets as $key => $val ) {
+				?>
                 <li>
                     <div class="tweet-avatar-wrap">
-                        <img src="<?php echo $val['avatar_link'];?>" alt="<?php echo $val['name'];?>">
+                        <img src="<?php echo $val['avatar_link']; ?>" alt="<?php echo $val['name']; ?>">
                     </div>
                     <div class="tweet-details">
-                        <a href="<?php echo $val['permalink'] ?>"><span class="screen-name">@<?php echo $val['screen_name'] ?></span></a>
-                       <div class="tweet-content">
-	                       <?php echo $val['content'] ?>
-                       </div>
+                        <a href="<?php echo $val['permalink'] ?>"><span
+                                    class="screen-name">@<?php echo $val['screen_name'] ?></span></a>
+                        <div class="tweet-content">
+							<?php echo $val['content'] ?>
+                        </div>
 
-                        <span class="tweet-time"><?php echo date_i18n( get_option('date_format'), $val['time'] );?></span>
+                        <span class="tweet-time"><?php echo date_i18n( get_option( 'date_format' ), $val['time'] ); ?></span>
 
                     </div>
                 </li>
-                <?php
-            }
-        ?>
-			<?php else : ?>
-            <li><?php _e('Waiting for Twitter...','birdmash-widget'); ?></li>
+				<?php
+			}
+			?>
+		<?php else : ?>
+            <li><?php _e( 'Waiting for Twitter...', 'birdmash-widget' ); ?></li>
 		<?php endif; ?>
 
-        <?php
+		<?php
 
 		echo '</ul>';
 
 		echo $after_widget;
 	}
 
-	function tweets_by_date_posted($tweet1,$tweet2){
-		return $tweet2['time'] - $tweet1['time'];
+	function process_contents( $tweet ) {
 
-    }
-
-	function process_contents($tweet) {
-
-		if(isset($tweet->retweeted_status)) {
-			$rt_section = current(explode(":", $tweet->text));
-			$text = $rt_section.": ";
+		if ( isset( $tweet->retweeted_status ) ) {
+			$rt_section = current( explode( ":", $tweet->text ) );
+			$text       = $rt_section . ": ";
 			$text .= $tweet->retweeted_status->text;
 		} else {
 			$text = $tweet->text;
 		}
 
-		$text = preg_replace('/((http)+(s)?:\/\/[^<>\s]+)/i', '<a href="$0" target="_blank" rel="nofollow">$0</a>', $text );
-		$text = preg_replace('/[@]+([A-Za-z0-9-_]+)/', '<a href="http://twitter.com/$1" target="_blank" rel="nofollow">@$1</a>', $text );
-		$text = preg_replace('/[#]+([A-Za-z0-9-_]+)/', '<a href="http://twitter.com/search?q=%23$1" target="_blank" rel="nofollow">$0</a>', $text );
+		$text = preg_replace( '/((http)+(s)?:\/\/[^<>\s]+)/i', '<a href="$0" target="_blank" rel="nofollow">$0</a>', $text );
+		$text = preg_replace( '/[@]+([A-Za-z0-9-_]+)/', '<a href="http://twitter.com/$1" target="_blank" rel="nofollow">@$1</a>', $text );
+		$text = preg_replace( '/[#]+([A-Za-z0-9-_]+)/', '<a href="http://twitter.com/search?q=%23$1" target="_blank" rel="nofollow">$0</a>', $text );
+
 		return $text;
 
 	}
+
+	function tweets_by_date_posted( $tweet1, $tweet2 ) {
+		return $tweet2['time'] - $tweet1['time'];
+
+	}
+
 
 	/**
 	 * Outputs the options form on admin
 	 *
 	 * @param array $instance The widget options
+	 * return void
 	 */
 	public function form( $instance ) {
 		// outputs the options form on admin
@@ -188,7 +195,7 @@ class Birdmash_Widget extends WP_Widget {
 		if ( ! in_array( 'curl', get_loaded_extensions() ) ) {
 			echo '<p><strong>';
 			_e( 'cURL is not installed.Its required to use Twitter API:', 'birdmash-widget' );
-			echo ' <a href="http://curl.haxx.se/docs/install.html" taget="_blank">';
+			echo ' <a href="http://curl.haxx.se/docs/install.html" target="_blank">';
 			_e( 'cURL install', 'birdmash-widget' );
 			echo '</a></strong></p>';
 		}
@@ -265,6 +272,7 @@ class Birdmash_Widget extends WP_Widget {
 	 */
 	public function update( $new_instance, $old_instance ) {
 		// processes widget options to be saved
+		delete_transient( $this->transient_name );
 		$instance = $old_instance;
 
 		$instance['title']             = strip_tags( $new_instance['title'] );
@@ -277,10 +285,10 @@ class Birdmash_Widget extends WP_Widget {
 		return $instance;
 	}
 
-	public function register_scripts(){
-	    wp_register_style('birdmash', plugins_url('/assets/css/public.min.css', __FILE__));
-	    wp_enqueue_style('birdmash');
-    }
+	public function register_scripts() {
+		wp_register_style( 'birdmash', plugins_url( '/assets/css/public.min.css', __FILE__ ) );
+		wp_enqueue_style( 'birdmash' );
+	}
 }
 
 add_action( 'widgets_init', function () {
