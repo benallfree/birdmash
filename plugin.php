@@ -294,3 +294,8 @@ class Birdmash_Widget extends WP_Widget {
 add_action( 'widgets_init', function () {
 	register_widget( 'Birdmash_Widget' );
 } );
+add_action( 'plugins_loaded', 'birdmash_widget_twitter_load_plugin_textdomain' );
+// Now loads language files
+function birdmash_widget_twitter_load_plugin_textdomain() {
+	load_plugin_textdomain( 'birdmash-widget', false, dirname(plugin_basename(__FILE__)) . '/languages/' );
+}
