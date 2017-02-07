@@ -31,6 +31,11 @@ if ( ! defined( 'WPINC' ) ) {
 }
 
 /**
+ * Require the StormTwitter library.
+ */
+require_once('lib/storm-twitter/StormTwitter.class.php');
+
+/**
  * Include the class that provides the functionality for the plugin.
  */
 include_once( 'class-birdmash-widget.php' );
