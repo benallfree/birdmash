@@ -1,16 +1,33 @@
-/*
-Plugin Name: Birdmash
-Version: 1.0
-Author: Haxor
-*/
+<?php
+
+/**
+ * Plugin Name: Birdmash
+ * Plugin URI:  http://bytion.io
+ * Description: Widget to track selected twitter account activities.
+ * Version:     0.1.0
+ * Author:      Mike Grotton
+ * Author URI:  http://michaelgrotton.com
+ * License:     GPLv2
+ * Text Domain: bird-mash
+ *
+ * @package Birdmash
+ * @version 0.1.0
+ */
 
 class Birdmash_Widget extends WP_Widget {
+
+  // Twitter API Key
+	protected $twitter_consumer = 'qyjtu5JFk5MsBnIKvD4KWcfrb';
+
+	// Twitter Secret Key
+	protected $twitter_secret = 'XjAs4hcAq4Lk1CI9RGnu4w2lGhxSsn8WHfuOoUs49cufORxyFU';
 
 	/**
 	 * Sets up the widgets name etc
 	 */
 	public function __construct() {
-		$widget_ops = array( 
+		require plugin_dir_path( __FILE__ ) . '/vendor/autoload.php';
+		$widget_ops = array(
 			'classname' => 'birdmash_widget',
 			'description' => 'Multiuser Twitter Mashup',
 		);

@@ -1,0 +1,30 @@
+{
+  "name": "simplon/twitter",
+  "description": "Twitter API Library w/ OAuth",
+  "homepage": "https://github.com/fightbulc/simplon_twitter",
+  "type": "library",
+  "keywords": [
+    "twitter",
+    "api",
+    "http",
+    "oauth"
+  ],
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "Tino Ehrich",
+      "email": "tino@bigpun.me",
+      "role": "developer"
+    }
+  ],
+  "require": {
+    "php": ">=5.4",
+    "simplon/request": "0.4.*",
+    "simplon/helper": "0.11.*"
+  },
+  "autoload": {
+    "psr-4": {
+      "Simplon\\Twitter\\": "src/"
+    }
+  }
+}
