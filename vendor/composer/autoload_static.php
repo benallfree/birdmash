@@ -4,46 +4,15 @@
 
 namespace Composer\Autoload;
 
-class ComposerStaticInit70382e120f6bd2672b996e43d802b541
+class ComposerStaticInitf30430941235bed87a84e5e3e0a4f49d
 {
     public static $files = array (
-        '65fec9ebcfbb3cbb4fd0d519687aea01' => __DIR__ . '/..' . '/danielstjules/stringy/src/Create.php',
-    );
-
-    public static $prefixLengthsPsr4 = array (
-        'S' => 
-        array (
-            'Stringy\\' => 8,
-            'Simplon\\Twitter\\' => 16,
-            'Simplon\\Request\\' => 16,
-            'Simplon\\Helper\\' => 15,
-        ),
-    );
-
-    public static $prefixDirsPsr4 = array (
-        'Stringy\\' => 
-        array (
-            0 => __DIR__ . '/..' . '/danielstjules/stringy/src',
-        ),
-        'Simplon\\Twitter\\' => 
-        array (
-            0 => __DIR__ . '/..' . '/simplon/twitter/src',
-        ),
-        'Simplon\\Request\\' => 
-        array (
-            0 => __DIR__ . '/..' . '/simplon/request/src',
-        ),
-        'Simplon\\Helper\\' => 
-        array (
-            0 => __DIR__ . '/..' . '/simplon/helper/src',
-        ),
+        'aca594cec0c196659a3b7d4dc2665c0b' => __DIR__ . '/..' . '/j7mbo/twitter-api-php/TwitterAPIExchange.php',
     );
 
     public static function getInitializer(ClassLoader $loader)
     {
         return \Closure::bind(function () use ($loader) {
-            $loader->prefixLengthsPsr4 = ComposerStaticInit70382e120f6bd2672b996e43d802b541::$prefixLengthsPsr4;
-            $loader->prefixDirsPsr4 = ComposerStaticInit70382e120f6bd2672b996e43d802b541::$prefixDirsPsr4;
 
         }, null, ClassLoader::class);
     }

@@ -16,19 +16,12 @@
 
 class Birdmash_Widget extends WP_Widget {
 
-	/**
-	 * Twitter API key.
-	 *
-	 * @var string
-	 */
-	protected $twitter_consumer = 'qyjtu5JFk5MsBnIKvD4KWcfrb';
-
-	/**
-	 * Twitter API secret.
-	 *
-	 * @var string
-	 */
-	protected $twitter_secret = 'XjAs4hcAq4Lk1CI9RGnu4w2lGhxSsn8WHfuOoUs49cufORxyFU';
+	public $twitter_settings = array(
+	    'oauth_access_token' => "8312152-cdqlf2advJxlnWgUoaLC4sWBM2VlZrhjiq612v75zh",
+	    'oauth_access_token_secret' => "rtgkwEocTEFRX466rDFZwccIPdsoimTQSJmW6oz0CDbQP",
+	    'consumer_key' => "qyjtu5JFk5MsBnIKvD4KWcfrb",
+	    'consumer_secret' => "XjAs4hcAq4Lk1CI9RGnu4w2lGhxSsn8WHfuOoUs49cufORxyFU"
+	);
 
 	/**
 	 * Default Widget title if none is entered.
@@ -57,6 +50,9 @@ class Birdmash_Widget extends WP_Widget {
 	 */
 	public function widget( $args, $instance ) {
 		// outputs the content of the widget
+
+		<h1>hi</h1><?php
+
 	}
 
 	/**
@@ -113,9 +109,13 @@ class Birdmash_Widget extends WP_Widget {
 	 *
 	 * @return Array An array of sorted tweets.
 	 */
-	public function get_tweets() {
-		return $tweets;
-	}
+	public function get_tweets( $accounts ) {
+
+		// No accounts configured? Bail early.
+		if ( empty( $accounts ) ) {
+			return;
+		}
+
 }
 
 add_action( 'widgets_init', function(){

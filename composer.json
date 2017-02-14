@@ -1,5 +1,5 @@
 {
     "require": {
-        "simplon/twitter": "*"
+        "j7mbo/twitter-api-php": "dev-master"
     }
 }
