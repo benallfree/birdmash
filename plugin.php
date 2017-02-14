@@ -16,11 +16,26 @@
 
 class Birdmash_Widget extends WP_Widget {
 
-  // Twitter API Key
+	/**
+	 * Twitter API key.
+	 *
+	 * @var string
+	 */
 	protected $twitter_consumer = 'qyjtu5JFk5MsBnIKvD4KWcfrb';
 
-	// Twitter Secret Key
+	/**
+	 * Twitter API secret.
+	 *
+	 * @var string
+	 */
 	protected $twitter_secret = 'XjAs4hcAq4Lk1CI9RGnu4w2lGhxSsn8WHfuOoUs49cufORxyFU';
+
+	/**
+	 * Default Widget title if none is entered.
+	 *
+	 * @var string
+	 */
+	protected $default_widget_title = 'BirdMash!';
 
 	/**
 	 * Sets up the widgets name etc
@@ -67,8 +82,8 @@ class Birdmash_Widget extends WP_Widget {
 	/**
 	 * Processing widget options on save
 	 *
-	 * @param array $new_instance The new options
-	 * @param array $old_instance The previous options
+	 * @param array $new_instance The new options.
+	 * @param array $old_instance The previous options.
 	 */
 	public function update( $new_instance, $old_instance ) {
 		// Previously saved values.
@@ -76,6 +91,7 @@ class Birdmash_Widget extends WP_Widget {
 
 		// Sanitize title before saving to database.
 		$instance['title'] = sanitize_text_field( $new_instance['title'] );
+		$instance['accounts'] = $new_instance['accounts'];
 
 		// Flush cache.
 		$this->flush_widget_cache();
@@ -90,6 +106,15 @@ class Birdmash_Widget extends WP_Widget {
 	 */
 	public function flush_widget_cache() {
 		// to do.
+	}
+
+	/**
+	 * Get tweets from the Twitter API.
+	 *
+	 * @return Array An array of sorted tweets.
+	 */
+	public function get_tweets() {
+		return $tweets;
 	}
 }
 
