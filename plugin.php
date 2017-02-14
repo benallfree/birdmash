@@ -56,12 +56,12 @@ class Birdmash_Widget extends WP_Widget {
 			)
 		);
 
-				?>
-					<p><label for="<?php echo esc_attr( $this->get_field_id( 'title' ) ); ?>"><?php esc_html_e( 'Title:', 'bird-mash' ); ?></label>
-					<input class="widefat" id="<?php echo esc_attr( $this->get_field_id( 'title' ) ); ?>" name="<?php echo esc_attr( $this->get_field_name( 'title' ) ); ?>" type="text" value="<?php echo esc_html( $instance['title'] ); ?>" placeholder="optional" /></p>
-					<p><label for="<?php echo esc_attr( $this->get_field_id( 'accounts' ) ); ?>"><?php esc_html_e( 'Twitter Accounts (Comma separated, no \'@\'):', 'bird-mash' ); ?></label>
-					<input class="widefat" id="<?php echo esc_attr( $this->get_field_id( 'accounts' ) ); ?>" name="<?php echo esc_attr( $this->get_field_name( 'accounts' ) ); ?>" type="text" value="<?php echo esc_html( $instance['accounts'] ); ?>" placeholder="accout one, account two, ..." /></p>
-				<?php
+		?>
+		<p><label for="<?php echo esc_attr( $this->get_field_id( 'title' ) ); ?>"><?php esc_html_e( 'Title:', 'bird-mash' ); ?></label>
+		<input class="widefat" id="<?php echo esc_attr( $this->get_field_id( 'title' ) ); ?>" name="<?php echo esc_attr( $this->get_field_name( 'title' ) ); ?>" type="text" value="<?php echo esc_html( $instance['title'] ); ?>" placeholder="optional" /></p>
+		<p><label for="<?php echo esc_attr( $this->get_field_id( 'accounts' ) ); ?>"><?php esc_html_e( 'Twitter Accounts (Comma separated, no \'@\'):', 'bird-mash' ); ?></label>
+		<input class="widefat" id="<?php echo esc_attr( $this->get_field_id( 'accounts' ) ); ?>" name="<?php echo esc_attr( $this->get_field_name( 'accounts' ) ); ?>" type="text" value="<?php echo esc_html( $instance['accounts'] ); ?>" placeholder="accout one, account two, ..." /></p>
+		<?php
 	}
 
 	/**
@@ -71,7 +71,25 @@ class Birdmash_Widget extends WP_Widget {
 	 * @param array $old_instance The previous options
 	 */
 	public function update( $new_instance, $old_instance ) {
-		// processes widget options to be saved
+		// Previously saved values.
+		$instance = $old_instance;
+
+		// Sanitize title before saving to database.
+		$instance['title'] = sanitize_text_field( $new_instance['title'] );
+
+		// Flush cache.
+		$this->flush_widget_cache();
+
+		return $instance;
+	}
+
+	/**
+	 * TODO: function to flush widget cache when options are updated.
+	 *
+	 * @return void
+	 */
+	public function flush_widget_cache() {
+		// to do.
 	}
 }
 
