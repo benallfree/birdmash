@@ -50,7 +50,18 @@ class Birdmash_Widget extends WP_Widget {
 	 * @param array $instance The widget options
 	 */
 	public function form( $instance ) {
-		// outputs the options form on admin
+		$instance = wp_parse_args( (array) $instance,
+			array(
+				'title' => $this->default_widget_title,
+			)
+		);
+
+				?>
+					<p><label for="<?php echo esc_attr( $this->get_field_id( 'title' ) ); ?>"><?php esc_html_e( 'Title:', 'bird-mash' ); ?></label>
+					<input class="widefat" id="<?php echo esc_attr( $this->get_field_id( 'title' ) ); ?>" name="<?php echo esc_attr( $this->get_field_name( 'title' ) ); ?>" type="text" value="<?php echo esc_html( $instance['title'] ); ?>" placeholder="optional" /></p>
+					<p><label for="<?php echo esc_attr( $this->get_field_id( 'accounts' ) ); ?>"><?php esc_html_e( 'Twitter Accounts (Comma separated, no \'@\'):', 'bird-mash' ); ?></label>
+					<input class="widefat" id="<?php echo esc_attr( $this->get_field_id( 'accounts' ) ); ?>" name="<?php echo esc_attr( $this->get_field_name( 'accounts' ) ); ?>" type="text" value="<?php echo esc_html( $instance['accounts'] ); ?>" placeholder="accout one, account two, ..." /></p>
+				<?php
 	}
 
 	/**
