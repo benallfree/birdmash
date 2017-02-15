@@ -138,7 +138,44 @@ class Birdmash_Widget extends WP_Widget {
 			return $this->twitter_cache;
 		}
 
-		// Build the tweet cache.
+		// No cache, let's build the tweet cache.
+		$tweets = array();
+		$screen_names = explode( ',', $accounts );
+		foreach ( $screen_names as $screen_name ) {
+			$some_tweets = $this->retrieve_tweets( $screen_name );
+			$tweets = array_merge( $tweets, $some_tweets );
+		}
+
+		$this->twitter_cache = $tweets;
+		set_transient( 'birdmash-public-cache', $this->twitter_cache, HOUR_IN_SECONDS );
+		return $this->twitter_cache;
+	}
+
+	/**
+	 * Get tweets from Twitter API.
+	 *
+	 * @param  string $screen_name The screen name to get tweets from.
+	 * @return array the tweets retrieved.
+	 */
+	public function retrieve_tweets( $screen_name ) {
+		// Connect to the api.
+		$twitter = new TwitterAPIExchange( $this->twitter_settings );
+		$retrieved = array();
+		$tweets = json_decode( $twitter->setGetfield( '?screen_name=' . $screen_name . '&count=3&include_rts=false' )
+		->buildOauth( 'https://api.twitter.com/1.1/statuses/user_timeline.json', 'GET' )->performRequest(), true );
+
+		// If there are errors with request, bail early.
+		if ( array_key_exists( 'errors', $tweets ) ) {
+			return $retrieved;
+		}
+		foreach ( $tweets as $tweet ) {
+			$retrieved[]['created'] = $tweet['created_at'];
+			$retrieved[]['screen_name'] = $tweet['user']['screen_name'];
+			$retrieved[]['text'] = $tweet['text'];
+			$retrieved[]['id'] = $tweet['id_str'];
+			$retrieved[]['profile_img'] = $tweet['user']['profile_image_url'];
+		}
+		return $retrieved;
 	}
 }
 
