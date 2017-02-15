@@ -53,6 +53,25 @@ class Birdmash_Widget extends WP_Widget {
 			'description' => 'Multiuser Twitter Mashup',
 		);
 		parent::__construct( 'birdmash_widget', 'Birdmash Widget', $widget_ops );
+		$this->hooks();
+	}
+
+	/**
+	 * Hooks.
+	 *
+	 * @return void
+	 */
+	public function hooks() {
+		add_action( 'wp_enqueue_scripts', array( $this, 'styles' ) );
+	}
+
+	/**
+	 * Styles.
+	 *
+	 * @return void
+	 */
+	public function styles() {
+		wp_enqueue_style( 'birdmash-style', plugin_dir_url( __FILE__ ) . 'style.min.css', array(), '0.1', 'screen' );
 	}
 
 	/**
@@ -62,7 +81,23 @@ class Birdmash_Widget extends WP_Widget {
 	 * @param array $instance the instance settings.
 	 */
 	public function widget( $args, $instance ) {
-		// outputs the content of the widget.
+		echo $args['before_widget'];
+
+		if ( ! empty( $instance['title'] ) ) {
+			echo $args['before_title'] . apply_filters( 'widget_title', $instance['title'] ) . $args['after_title'];
+		}
+
+		$tweets = $this->get_tweets( $instance['accounts'] );
+		echo '<div id="birdmash_widget">';
+		echo '<ul>';
+
+		foreach ( $tweets as $tweet ) {
+			echo '<li><img src="' . $tweet['profile_img'] . '" /><strong>@' . $tweet['screen_name'] . '</strong> <em>' . $tweet['text'] . '</em></li>';
+		}
+
+		echo '</ul>';
+		echo '</div>';
+		echo $args['after_widget'];
 	}
 
 	/**
@@ -134,6 +169,7 @@ class Birdmash_Widget extends WP_Widget {
 
 		// If no cache defined, try to get it from the transient first. If that exists, return it.
 		$this->twitter_cache = get_transient( 'birdmash-public-cache' );
+
 		if ( $this->twitter_cache ) {
 			return $this->twitter_cache;
 		}
@@ -141,11 +177,19 @@ class Birdmash_Widget extends WP_Widget {
 		// No cache, let's build the tweet cache.
 		$tweets = array();
 		$screen_names = explode( ',', $accounts );
+
 		foreach ( $screen_names as $screen_name ) {
 			$some_tweets = $this->retrieve_tweets( $screen_name );
 			$tweets = array_merge( $tweets, $some_tweets );
 		}
 
+		// Sort the tweets by date descending.
+		uasort( $tweets, function( $a, $b ) {
+			if ( strtotime( $a['created'] ) === strtotime( $b['created'] ) ) {
+				return 0;
+			}
+			return ( strtotime( $a['created'] ) > strtotime( $b['created'] ) ) ? + 1 : -1;
+		}  );
 		$this->twitter_cache = $tweets;
 		set_transient( 'birdmash-public-cache', $this->twitter_cache, HOUR_IN_SECONDS );
 		return $this->twitter_cache;
@@ -161,20 +205,24 @@ class Birdmash_Widget extends WP_Widget {
 		// Connect to the api.
 		$twitter = new TwitterAPIExchange( $this->twitter_settings );
 		$retrieved = array();
-		$tweets = json_decode( $twitter->setGetfield( '?screen_name=' . $screen_name . '&count=3&include_rts=false' )
+		$tweets = json_decode( $twitter->setGetfield( '?screen_name=' . $screen_name . '&count=3' )
 		->buildOauth( 'https://api.twitter.com/1.1/statuses/user_timeline.json', 'GET' )->performRequest(), true );
 
 		// If there are errors with request, bail early.
 		if ( array_key_exists( 'errors', $tweets ) ) {
 			return $retrieved;
 		}
+
 		foreach ( $tweets as $tweet ) {
-			$retrieved[]['created'] = $tweet['created_at'];
-			$retrieved[]['screen_name'] = $tweet['user']['screen_name'];
-			$retrieved[]['text'] = $tweet['text'];
-			$retrieved[]['id'] = $tweet['id_str'];
-			$retrieved[]['profile_img'] = $tweet['user']['profile_image_url'];
+			$retrieved[] = array(
+				'created'     => $tweet['created_at'],
+				'screen_name' => $tweet['user']['screen_name'],
+				'text'        => $tweet['text'],
+				'id'          => $tweet['id_str'],
+				'profile_img' => $tweet['user']['profile_image_url'],
+			);
 		}
+
 		return $retrieved;
 	}
 }
