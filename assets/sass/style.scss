@@ -1,0 +1,21 @@
+#birdmash_widget {
+
+	ul, li {
+		list-style-type: none
+  }
+	li {
+		display: inline-block;
+		margin-bottom: 5px;
+		padding: 5px;
+		background: #efefff
+	}
+	li img {
+		float: left;
+		width: 20px;
+		height: auto;
+		padding: 5px 5px 0px 0px
+	}
+	li:after {
+		clear: both
+	}
+}
