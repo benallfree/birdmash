@@ -1,52 +1,33 @@
+<?php
+
 /*
 Plugin Name: Birdmash
 Version: 1.0
-Author: Haxor
+Author: Ivaylo Zahariev
 */
 
-class Birdmash_Widget extends WP_Widget {
-
-	/**
-	 * Sets up the widgets name etc
-	 */
-	public function __construct() {
-		$widget_ops = array( 
-			'classname' => 'birdmash_widget',
-			'description' => 'Multiuser Twitter Mashup',
-		);
-		parent::__construct( 'birdmash_widget', 'Birdmash Widget', $widget_ops );
-	}
-
-	/**
-	 * Outputs the content of the widget
-	 *
-	 * @param array $args
-	 * @param array $instance
-	 */
-	public function widget( $args, $instance ) {
-		// outputs the content of the widget
-	}
-
-	/**
-	 * Outputs the options form on admin
-	 *
-	 * @param array $instance The widget options
-	 */
-	public function form( $instance ) {
-		// outputs the options form on admin
-	}
-
-	/**
-	 * Processing widget options on save
-	 *
-	 * @param array $new_instance The new options
-	 * @param array $old_instance The previous options
-	 */
-	public function update( $new_instance, $old_instance ) {
-		// processes widget options to be saved
-	}
+# print for hoomans
+if( ! function_exists( 'd' ) ) {
+    function d( $what ) {
+        print '<pre>';
+        print_r( $what );
+        print '</pre>';
+    }
 }
 
-add_action( 'widgets_init', function(){
-	register_widget( 'Birdmash_Widget' );
-});
+# set some paths as static variable
+if( ! defined( 'BIRDSMASH_DIR' ) ) {
+	DEFINE( 'BIRDSMASH_DIR', plugin_dir_path( __FILE__ ) );
+}
+if( ! defined( 'BIRDSMASH_URL' ) ) {
+	DEFINE( 'BIRDSMASH_URL', plugin_dir_url( __FILE__ ) );
+}
+
+# core plugin functions
+include BIRDSMASH_DIR . 'inc/core.php';
+
+# handle ajax
+include BIRDSMASH_DIR . 'inc/ajax.php';
+
+# build the widget
+include BIRDSMASH_DIR . 'inc/widget.php';
