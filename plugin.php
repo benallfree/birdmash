@@ -2,7 +2,7 @@
 
 /**
  * Plugin Name: Birdmash
- * Plugin URI:  http://bytion.io
+ * Plugin URI:  https://github.com/CrowdForge/birdmash
  * Description: Widget to track selected twitter account activities.
  * Version:     0.1.0
  * Author:      Mike Grotton
@@ -10,18 +10,31 @@
  * License:     GPLv2
  * Text Domain: bird-mash
  *
+ * @link https://github.com/CrowdForge/birdmash
+ *
  * @package Birdmash
  * @version 0.1.0
  */
-
 class Birdmash_Widget extends WP_Widget {
 
+	/**
+	 * Settings for the twitter api library.
+	 *
+	 * @var array
+	 */
 	public $twitter_settings = array(
-	    'oauth_access_token' => "8312152-cdqlf2advJxlnWgUoaLC4sWBM2VlZrhjiq612v75zh",
-	    'oauth_access_token_secret' => "rtgkwEocTEFRX466rDFZwccIPdsoimTQSJmW6oz0CDbQP",
-	    'consumer_key' => "qyjtu5JFk5MsBnIKvD4KWcfrb",
-	    'consumer_secret' => "XjAs4hcAq4Lk1CI9RGnu4w2lGhxSsn8WHfuOoUs49cufORxyFU"
+	    'oauth_access_token' => '8312152-cdqlf2advJxlnWgUoaLC4sWBM2VlZrhjiq612v75zh',
+	    'oauth_access_token_secret' => 'rtgkwEocTEFRX466rDFZwccIPdsoimTQSJmW6oz0CDbQP',
+	    'consumer_key' => 'qyjtu5JFk5MsBnIKvD4KWcfrb',
+	    'consumer_secret' => 'XjAs4hcAq4Lk1CI9RGnu4w2lGhxSsn8WHfuOoUs49cufORxyFU',
 	);
+
+	/**
+	 * The cache for tweets, stored in transient/wp cache.
+	 *
+	 * @var string
+	 */
+	public $tweets_cache = null;
 
 	/**
 	 * Default Widget title if none is entered.
@@ -45,20 +58,17 @@ class Birdmash_Widget extends WP_Widget {
 	/**
 	 * Outputs the content of the widget
 	 *
-	 * @param array $args
-	 * @param array $instance
+	 * @param array $args the arguments.
+	 * @param array $instance the instance settings.
 	 */
 	public function widget( $args, $instance ) {
-		// outputs the content of the widget
-
-		<h1>hi</h1><?php
-
+		// outputs the content of the widget.
 	}
 
 	/**
 	 * Outputs the options form on admin
 	 *
-	 * @param array $instance The widget options
+	 * @param array $instance The widget options.
 	 */
 	public function form( $instance ) {
 		$instance = wp_parse_args( (array) $instance,
@@ -96,17 +106,18 @@ class Birdmash_Widget extends WP_Widget {
 	}
 
 	/**
-	 * TODO: function to flush widget cache when options are updated.
+	 * Function to flush widget cache when options are updated.
 	 *
 	 * @return void
 	 */
 	public function flush_widget_cache() {
-		// to do.
+		delete_transient( 'birdmash-public-cache' );
 	}
 
 	/**
 	 * Get tweets from the Twitter API.
 	 *
+	 * @param Array $accounts comma separated list of accounts.
 	 * @return Array An array of sorted tweets.
 	 */
 	public function get_tweets( $accounts ) {
@@ -116,6 +127,19 @@ class Birdmash_Widget extends WP_Widget {
 			return;
 		}
 
+		// If the cache is full, return it.
+		if ( ! is_null( $this->twitter_cache ) ) {
+			return $this->twitter_cache;
+		}
+
+		// If no cache defined, try to get it from the transient first. If that exists, return it.
+		$this->twitter_cache = get_transient( 'birdmash-public-cache' );
+		if ( $this->twitter_cache ) {
+			return $this->twitter_cache;
+		}
+
+		// Build the tweet cache.
+	}
 }
 
 add_action( 'widgets_init', function(){
