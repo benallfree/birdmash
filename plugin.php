@@ -170,10 +170,15 @@ class Birdmash_Widget extends WP_Widget {
         foreach($this->tweets as $tweet):
         ?>
             <div class="bm_tweet">
-                <span class="bm_tweet-text"><?php echo $tweet->text; ?></span>
-                <span class="bm_tweet-time">--<?php echo $this->time_ago($tweet->created_at); ?></span>
-                <span class="bm_tweet-user">@<?php echo $tweet->user->screen_name; ?></span>
-                <img src="<?php echo $tweet->user->profile_image_url; ?>" class="bm_tweet-pic" />
+                <div class="left">
+                    <img src="<?php echo $tweet->user->profile_image_url; ?>" class="bm_tweet-pic" />
+                    <span class="bm_tweet-user">@<?php echo $tweet->user->screen_name; ?></span>
+                </div>
+
+                <div class="right">
+                    <p class="bm_tweet-text"><?php echo $tweet->text; ?></p>
+                    <span class="bm_tweet-time">--<?php echo $this->time_ago($tweet->created_at); ?></span>
+                </div>
             </div>
         <?php
         endforeach;
@@ -217,3 +222,8 @@ class Birdmash_Widget extends WP_Widget {
 add_action( 'widgets_init', function(){
     register_widget( 'Birdmash_Widget' );
 });
+
+function birdmash_styles(){
+    wp_enqueue_style('birdmash_css', plugin_dir_url(__FILE__) . "assets/css/main.min.css");
+}
+add_action( 'wp_enqueue_scripts', 'birdmash_styles' );

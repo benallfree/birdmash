@@ -1,0 +1,33 @@
+.birdmash_widget{
+    .bm_tweet{
+        border: 2px solid black;
+        border-radius: 2px;
+        background-color: rgba(#00aced, 0.7);
+        margin-bottom: 5px;
+        padding: 5px;
+
+        .left,
+        .right{
+            width: 50%;
+            margin-right: -4px;
+            display: inline-block;
+            vertical-align: middle;
+        }
+
+        &-text{
+            display: block;
+        }
+
+        &-time{
+            display: block;
+        }
+
+        &-user{
+            display: block;
+        }
+
+        &-pic{
+            display: block;
+        }
+    }
+}
