@@ -1,3 +1,5 @@
 *.sw*
 vendor/
 node_modules/
+assets/css/*
+assets/js/*
