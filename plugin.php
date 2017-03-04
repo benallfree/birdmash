@@ -6,8 +6,10 @@ Author: Haxor
 */
 
 require "vendor/autoload.php";
+use Abraham\TwitterOAuth\TwitterOAuth;
 
 class Birdmash_Widget extends WP_Widget {
+    private $tweets = array();
 
 	/**
 	 * Sets up the widgets name etc
@@ -34,9 +36,7 @@ class Birdmash_Widget extends WP_Widget {
 			echo $args['before_title'] . apply_filters( 'widget_title', $instance['title'] ) . $args['after_title'];
 		}
 
-        if(!empty($instance['handles'])){
-            echo implode(', ', $instance['handles']);
-        }
+        $this->get_tweets();
 
 		echo $args['after_widget'];
 	}
@@ -106,8 +106,114 @@ class Birdmash_Widget extends WP_Widget {
         $new_instance['handles'] = !empty($new_instance['handles']) ? explode(',', str_replace(' ', '', $new_instance['handles'])) : "";
         return $new_instance;
     }
+
+    /**
+     * Retreives tweets cached in DB or places call to Twitter API
+     */
+    protected function save_tweets(){
+        // Get settings for API keys/tokens/secrets
+        $settings = $this->get_settings();
+		if(array_key_exists($this->number, $settings)){
+			$instance = $settings[$this->number];
+        }
+
+        $stored_tweets = get_transient('stored_tweets');
+        if($stored_tweets && $stored_tweets['handles'] == $instance['handles']){
+            $this->tweets = $stored_tweets['tweets'];
+            return;
+        }
+
+        // Make new connection to Twitter
+        $connection = new TwitterOAuth($instance['consumer_key'], $instance['consumer_secret'], $instance['access_token'], $instance['access_token_secret']);
+
+        // Get 3 most recent statuses for each user, add to $tweets
+        foreach($instance['handles'] as $twitter_handle){
+            $twitter_handle = str_replace('@', '', $twitter_handle);
+            $statuses = $connection->get("statuses/user_timeline", ["screen_name" => $twitter_handle, "count" => 3]);
+
+            if($connection->getLastHttpCode() == 200){
+                foreach($statuses as $tweet){
+                    $this->tweets[] = $tweet;
+                }
+            }
+            else{
+                $this->tweets = null;
+            }
+        }
+
+        // Sort tweets by creation date - most recent first
+        usort($this->tweets, function($a, $b){
+            return strtotime($a->created_at) < strtotime($b->created_at) ? 1 : -1;;
+        });
+
+        // We will save $instance as a transient, so add the tweets to this transient
+        $instance['tweets'] = $this->tweets;
+
+        // Store the transient
+        set_transient('stored_tweets', $instance, HOUR_IN_SECONDS);
+    }
+
+    /**
+     * Takes returned tweets and places data in HTML
+     */
+    public function get_tweets(){
+        $this->save_tweets();
+
+        if(!$this->tweets){
+            ?>
+            <p>Sorry, no tweets to dispay at this time.</p>
+            <?php
+            return;
+        }
+
+        //var_dump($this->tweets);
+        foreach($this->tweets as $tweet):
+        ?>
+            <div class="bm_tweet">
+                <span class="bm_tweet-text"><?php echo $tweet->text; ?></span>
+                <span class="bm_tweet-time">--<?php echo $this->time_ago($tweet->created_at); ?></span>
+                <span class="bm_tweet-user">@<?php echo $tweet->user->screen_name; ?></span>
+                <img src="<?php echo $tweet->user->profile_image_url; ?>" class="bm_tweet-pic" />
+            </div>
+        <?php
+        endforeach;
+    }
+
+    protected function time_ago($date_string){
+        $now  = time();
+        $then = strtotime($date_string);
+        $diff = $now - $then;
+
+        if($diff < 2){
+            return "right now";
+        }
+        if($diff < MINUTE_IN_SECONDS){
+            return "{$diff} seconds ago";
+        }
+        if($diff < MINUTE_IN_SECONDS * 2){
+            return "about 1 minute ago";
+        }
+        if($diff < HOUR_IN_SECONDS){
+            return floor($diff / MINUTE_IN_SECONDS) . " minutes ago";
+        }
+        if($diff < HOUR_IN_SECONDS * 2){
+            return "about 1 hour ago";
+        }
+        if($diff < DAY_IN_SECONDS){
+            return floor($diff / HOUR_IN_SECONDS) . " hours ago";
+        }
+        if($diff > DAY_IN_SECONDS && $diff < DAY_IN_SECONDS * 2){
+            return "yesterday";
+        }
+        if($diff < DAY_IN_SECONDS * 365){
+            return floor($diff / DAY_IN_SECONDS) . " days ago";
+        }
+        else{
+            return "over a year ago";
+        }
+    }
 }
 
 add_action( 'widgets_init', function(){
-	register_widget( 'Birdmash_Widget' );
+    register_widget( 'Birdmash_Widget' );
 });
