@@ -5,6 +5,8 @@ Version: 1.0
 Author: Haxor
 */
 
+require "vendor/autoload.php";
+
 class Birdmash_Widget extends WP_Widget {
 
 	/**
