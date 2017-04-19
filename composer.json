@@ -1,0 +1,23 @@
+{
+    "name": "cwuensche/birdmash",
+    "description": "Multiuser Twitter Mashup.",
+    "type": "library",
+    "keywords": [
+        "template"
+    ],
+    "homepage": "https://github.com/cwuensche/birdmash/",
+	    "authors": [
+        {
+            "name": "Carl Wuensche",
+            "email": "carl@wuensche.ca",
+            "role": "lead"
+        }
+    ],
+    "support": {
+        "issues": "https://github.com/cwuensche/birdmash/issues"
+    },
+    "require": {
+        "php": "^7.0",
+		"abraham/twitteroauth": "0.7.2"
+    }
+}

@@ -1,0 +1,28 @@
+.stream-item-header
+{
+	position: relative;
+}
+.FullNameSpanGroup
+{
+	position: absolute;
+	top: 0px;
+	padding-left: 55px;
+}
+
+.tweet-timestamp
+{
+	color: #2290bf!important;
+	padding-left: 10px;
+}
+.user_tweet_settings
+{
+	display: none;
+}
+.loading_message
+{
+	display: none;
+}
+.loading_status
+{
+	display: none;
+}
